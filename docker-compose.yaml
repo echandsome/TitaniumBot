@@ -1,0 +1,61 @@
+version: "3.9"
+services:
+#  solana_bot_backend_app :
+#     container_name: solana-bot-backend-app
+#     image: solana-bot-backend-app:v1.0
+#     build:
+#       context: .
+#       args:
+#         NODE_ENV: development
+#     ports:
+#       - "8100:8100"
+#       - "443:443"
+#     volumes:
+#       - .:/server
+#     env_file:
+#       - ./config/env/dev.env
+#     command: npm run start-dev
+#     depends_on:
+#       - solana_bot_mongo_db
+#       - solana_bot_redis_db
+#     restart: always
+
+ solana_bot_mongo_db:
+    container_name: solana-bot-mongo-db
+    image: "mongo:latest"
+    restart: always
+    env_file:
+      - ./config/env/dev.env
+    ports:
+      - "27017:27017"
+    volumes:
+      - solanabot:/data/db
+  
+ mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8500:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://solana_bot_mongo_db:27017/solana-bot
+
+ solana_bot_redis_db:
+    container_name: solana-bot-redis-db
+    image: "redis:alpine"
+    restart: always
+    ports:
+      - "6380:6379"
+    # volumes:
+    #   - solanabot:/data
+
+ solana_bot_redis_commander:
+    container_name: solana-bot-redis-commander
+    image: "rediscommander/redis-commander:latest"
+    restart: always
+    environment:
+    - REDIS_HOSTS=local:solana_bot_redis_db
+    ports:
+    - "5052:8081"
+
+volumes:
+  solanabot:
